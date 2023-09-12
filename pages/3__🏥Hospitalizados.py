@@ -25,7 +25,7 @@ df = load_data()
 
 #Group data based on location and replace 'NaN' values with zeros
 df_category = df[['entity', 'date', 'indicator', 'value']]
-df_group = df_category.groupby("entity")['entity', 'date', 'indicator', 'value'].max()
+df_group = df_category.groupby("entity")[['entity', 'date', 'indicator', 'value']].max()
 df_result = pd.DataFrame(df_group).replace(np.NaN, 0)
 
 #Selecionar por país

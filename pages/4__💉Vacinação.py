@@ -27,7 +27,7 @@ data = df_vaccines.loc[(df_vaccines["location"] != 'World') & (df_vaccines["loca
 #Group data based on location and replace 'NaN' values with zeros
 df_category = data[['location', 'date', 'total_vaccinations', 'people_vaccinated', 'people_fully_vaccinated', 'daily_vaccinations', 'daily_people_vaccinated']]
 
-df_group = df_category.groupby("location")["location", "date", "total_vaccinations", "people_vaccinated", "people_fully_vaccinated", "daily_vaccinations", "daily_people_vaccinated"].max()
+df_group = df_category.groupby("location")[["location", "date", "total_vaccinations", "people_vaccinated", "people_fully_vaccinated", "daily_vaccinations", "daily_people_vaccinated"]].max()
 
 df_result = pd.DataFrame(df_group).replace(np.NaN, 0)
 

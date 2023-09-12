@@ -31,7 +31,7 @@ data = df.loc[(df["location"] != 'World') & (df["location"] != 'Africa') &
 #Group data based on location and replace 'NaN' values with zeros
 df_category = data[['location', 'date', 'total_cases', 'new_cases','total_deaths','new_deaths', 'weekly_cases', 'weekly_deaths', 'biweekly_cases', 'biweekly_deaths']]
 
-df_group = df_category.groupby("location")["location", "date", "total_cases", "new_cases", "total_deaths", "new_deaths", "weekly_cases", "weekly_deaths", "biweekly_cases", "biweekly_deaths"].max()
+df_group = df_category.groupby("location")[["location", "date", "total_cases", "new_cases", "total_deaths", "new_deaths", "weekly_cases", "weekly_deaths", "biweekly_cases", "biweekly_deaths"]].max()
 
 df_result = pd.DataFrame(df_group).replace(np.NaN, 0)
 

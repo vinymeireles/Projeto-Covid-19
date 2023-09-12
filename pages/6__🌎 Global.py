@@ -23,7 +23,7 @@ df = load_data()
 #DataFrame
 if st.sidebar.checkbox("🧾 Mostrar Dados", False, key=1):
     st.write("🌐 Dados agrupados por continente")
-    df_group = df.groupby("Continent")["Continent", "Country", "Confirmed", "New cases", "Deaths", "New deaths", "Population"].sum().sort_values(by="Continent", ascending=True)
+    df_group = df.groupby("Continent")[["Continent", "Country", "Confirmed", "New cases", "Deaths", "New deaths", "Population"]].sum().sort_values(by="Continent", ascending=True)
     df_result = pd.DataFrame(df_group).replace(np.NaN, 0)
     st.write(df_result)
     st.divider()

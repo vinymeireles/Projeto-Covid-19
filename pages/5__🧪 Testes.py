@@ -20,7 +20,7 @@ def load_data():
 df = load_data()
 
 #Agrupar dados
-df_group = df.groupby("location")["location", "total_tests", "new_tests", "total_tests_per_thousand", "cumulative_positivity_rate", "testing_observations"].max()
+df_group = df.groupby("location")[["location", "total_tests", "new_tests", "total_tests_per_thousand", "cumulative_positivity_rate", "testing_observations"]].max()
 
 #df_result = pd.DataFrame(df_group).replace(np.NaN, 0) > preenche os valores NaN em 0
 df_result = pd.DataFrame(df_group.dropna(axis=0))      # exclui todas as linhas com valores nulos NaN

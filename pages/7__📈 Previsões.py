@@ -27,7 +27,7 @@ table[cases] = table[cases].fillna(0)
 latest = table[table['ObservationDate'] == max(table['ObservationDate'])].reset_index()
 
 latest_grouped = latest['Confirmed'] - latest['Deaths'] - latest['Recovered']
-latest_grouped = latest.groupby('Country/Region')['Confirmed', 'Deaths', 'Recovered', 'Active'].sum().reset_index()
+latest_grouped = latest.groupby('Country/Region')[['Confirmed', 'Deaths', 'Recovered', 'Active']].sum().reset_index()
 
 
 #Selecionar por país
@@ -81,7 +81,7 @@ if st.sidebar.checkbox("📝 Mostrar análise por localização", False, key=1):
 
 
 ### Agrupar os dados por dias(Days)
-latest_grouped = latest.groupby('Country/Region')['Confirmed', 'Deaths', 'Recovered', 'Active'].sum().reset_index()
+latest_grouped = latest.groupby('Country/Region')[['Confirmed', 'Deaths', 'Recovered', 'Active']].sum().reset_index()
 df = table.groupby('Days')['Confirmed', 'Deaths', 'Recovered', 'Active'].sum().reset_index()
 
 ### Gráficos agrupados por tempo (Days)########################################
@@ -114,7 +114,7 @@ if st.sidebar.checkbox("📊 Mostrar Gráficos", False, key=2):
 
     #Gráfico de barras: Top 10 dos países com maior número de óbitos confirmados:
     if not st.checkbox('Ocultar gráfico 5', False, key=7):
-        latest_grouped = latest.groupby('Country/Region')['Confirmed', 'Deaths', 'Recovered', 'Active'].sum().reset_index()
+        latest_grouped = latest.groupby('Country/Region')[['Confirmed', 'Deaths', 'Recovered', 'Active']].sum().reset_index()
         pred = latest_grouped.sort_values(by='Active', ascending=False)[:10]
         fig = px.bar(pred, x='Active', y='Country/Region',
                     hover_data=['Active'], color='Active',
@@ -126,5 +126,5 @@ if st.sidebar.checkbox("📊 Mostrar Gráficos", False, key=2):
 if st.sidebar.checkbox("⏰ Previsões Futuras", False, key=8):
     st.markdown("📈 Visualização dos resultados das previsões em relação ao tempo IA (Deep Learning)")
 
-    lstm_data = table.groupby('ObservationDate')['Confirmed', 'Deaths', 'Recovered'].sum().reset_index()
+    lstm_data = table.groupby('ObservationDate')[['Confirmed', 'Deaths', 'Recovered']].sum().reset_index()
     st.write(lstm_data)
