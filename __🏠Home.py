@@ -60,14 +60,14 @@ df.drop(indexNames , inplace=True)
 #10 Países com o maior índice de casos confirmados
 if st.sidebar.checkbox(" 🔟 Mostrar índices", False, key=1):
     st.write('10 Países com o maior índice de casos: 📊')
-    df_group10 = df_category.groupby("location")["total_cases"].max()
+    df_group10 = df_category.groupby("location")[["total_cases"]].max()
     top_10_population = pd.DataFrame(df_group10).sort_values(by="total_cases", ascending=False)[:10]
-    st.write(top_10_population, use_container_width=True)
+    st.write(top_10_population)
 
 #Gráfico 10 top
     if not st.checkbox('Ocultar gráfico 1', False, key=2):
         st.write('Gráfico dos 10 Países com o maior índice de casos: ')
-        data2 = df_category.groupby("location")["location", "total_cases"].max().sort_values(by="total_cases", ascending=False)[:10]
+        data2 = df_category.groupby("location")[["location", "total_cases"]].max().sort_values(by="total_cases", ascending=False)[:10]
         fig2 = px.bar(data2, x= "location" , y="total_cases", color="total_cases")
         st.plotly_chart(fig2)
 

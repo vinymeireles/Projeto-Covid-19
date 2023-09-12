@@ -82,7 +82,7 @@ if st.sidebar.checkbox("📝 Mostrar análise por localização", False, key=1):
 
 ### Agrupar os dados por dias(Days)
 latest_grouped = latest.groupby('Country/Region')[['Confirmed', 'Deaths', 'Recovered', 'Active']].sum().reset_index()
-df = table.groupby('Days')['Confirmed', 'Deaths', 'Recovered', 'Active'].sum().reset_index()
+df = table.groupby('Days')[['Confirmed', 'Deaths', 'Recovered', 'Active']].sum().reset_index()
 
 ### Gráficos agrupados por tempo (Days)########################################
 
