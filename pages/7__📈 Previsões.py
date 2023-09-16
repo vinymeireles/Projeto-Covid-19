@@ -7,6 +7,7 @@ from plotly import graph_objs as go
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings("ignore")
+from keras.models import load_model
 
 
 st.title("📈Previsões de novos casos: 2020 - 2023")

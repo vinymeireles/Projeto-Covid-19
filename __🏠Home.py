@@ -10,6 +10,10 @@ import matplotlib.pyplot as plt
 st.set_page_config(page_title="App Covid 19", page_icon= ":bar_chart:")
 st.title("💉Covid19: Dashboard Analytics📊")
 
+# Style
+with open('style.css')as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html = True)
+
 #load data
 @st.cache_data
 def load_data():
