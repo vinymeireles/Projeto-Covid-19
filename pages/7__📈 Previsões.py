@@ -5,7 +5,9 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 from plotly import graph_objs as go
 import matplotlib.pyplot as plt
-
+from keras.models import load_model
+import warnings
+warnings.filterwarnings("ignore")
 
 
 st.title("📈Previsões de novos casos: 2020 - 2023")
@@ -29,26 +31,6 @@ latest = table[table['ObservationDate'] == max(table['ObservationDate'])].reset_
 latest_grouped = latest['Confirmed'] - latest['Deaths'] - latest['Recovered']
 latest_grouped = latest.groupby('Country/Region')[['Confirmed', 'Deaths', 'Recovered', 'Active']].sum().reset_index()
 
-
-#Selecionar por país
-country_select = st.sidebar.selectbox('🔎 Selecionar a Localização:', latest_grouped['Country/Region'])
-select_country = latest_grouped[latest_grouped['Country/Region'] == country_select]
-
-#Função para visualizar os resultados filtrados por país
-def get_cases_analysis(dataresult):
-    total_res = pd.DataFrame({'Status': ['Confirmados', 'Óbitos', 'Recuperados', 'Ativos'],
-                            'Figure':(dataresult.iloc[0]['Confirmed'],  dataresult.iloc[0]['Deaths'], dataresult.iloc[0]['Recovered'],  dataresult.iloc[0]['Active'])
-                            })
-    return total_res
-
-total_country = get_cases_analysis(select_country)  
-
-# Data Visualization
-location_confirmed = total_country.Figure[0]
-location_deaths = total_country.Figure[1]
-location_recovered = total_country.Figure[2]
-location_active = total_country.Figure[3]
-
 #Visualizar DataFrame original
 if st.sidebar.checkbox("🧾 Mostrar DataFrame", False, key=0):
     st.markdown("Dados agrupados sobre os casos confirmados, óbitos, recuperados e ativos COVID-19")
@@ -58,12 +40,32 @@ if st.sidebar.checkbox("🧾 Mostrar DataFrame", False, key=0):
 st.divider()        
 
 #Informações em colunas dos resultados
-if st.sidebar.checkbox("📝 Mostrar análise por localização", False, key=1):
+if st.sidebar.checkbox("📝 Mostrar análise por País", False, key=1):
     st.markdown("📊 Análise de casos confirmados, óbitos, recuperados e ativos por país:")
+    
+    #Selecionar por país
+    country_select = st.selectbox('🔎 Selecionar o país:', latest_grouped['Country/Region'])
+    select_country = latest_grouped[latest_grouped['Country/Region'] == country_select]
+    st.divider()
+
+    #Função para visualizar os resultados filtrados por país
+    def get_cases_analysis(dataresult):
+        total_res = pd.DataFrame({'Status': ['Confirmados', 'Óbitos', 'Recuperados', 'Ativos'],
+                                'Figure':(dataresult.iloc[0]['Confirmed'],  dataresult.iloc[0]['Deaths'], dataresult.iloc[0]['Recovered'],  dataresult.iloc[0]['Active'])
+                                })
+        return total_res
+
+    total_country = get_cases_analysis(select_country)  
+
+    # Data Visualization
+    location_confirmed = total_country.Figure[0]
+    location_deaths = total_country.Figure[1]
+    location_recovered = total_country.Figure[2]
+    location_active = total_country.Figure[3]
 
     # 1ª linha dos resultados dos dados
     col1, col2, col3 = st.columns(3)
-    col1.text("📍Localização:")
+    col1.text("📍País:")
     col1.info(country_select)
     col2.text("😷 Casos Confirmados:")
     col2.info(f"{location_confirmed:,.0f}")
@@ -76,9 +78,7 @@ if st.sidebar.checkbox("📝 Mostrar análise por localização", False, key=1):
     col1.info(f"{location_recovered:,.0f}")
     col2.text("🤒 Casos semanais:")
     col2.info(f"{location_active:,.0f}")
-       
     st.divider()   
-
 
 ### Agrupar os dados por dias(Days)
 latest_grouped = latest.groupby('Country/Region')[['Confirmed', 'Deaths', 'Recovered', 'Active']].sum().reset_index()
@@ -100,7 +100,8 @@ if st.sidebar.checkbox("📊 Mostrar Gráficos", False, key=2):
         graph2 = px.line(df, x="Days", y="Deaths", title = '2. Taxa de casos de morte em relação ao tempo', template='plotly_dark')
         graph2.update_traces(line_color='red')
         st.plotly_chart(graph2)
-    
+
+
     if not st.checkbox('Ocultar gráfico 3', False, key=5):
         graph3 = px.line(df, x="Days", y="Deaths", title = '3. Taxa de casos recuperados em relação ao tempo', template='plotly_dark')
         graph3.update_traces(line_color='green')

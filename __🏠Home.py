@@ -35,7 +35,7 @@ df_result = pd.DataFrame(df_group).replace(np.NaN, 0)
 st.markdown("""Essa aplicação demonstra uma análise exploratória dos dados COVID-19 fornecidos pela Our World in Data (OWID) é feita, mostrando o avanço temporal de casos, óbitos e vacinação. 
 Estudos comparativos e busca de correlações são feitos com intuito de melhor compreender os dados. Animações como a mostrada acima serão criadas e interpretadas. Nessa seção poderá realizar consultas
 no DataFrame mundial, mostrar índices dos país com maiores casos, gráficos de expectativa de vida x total de casos e gráfico global, demonstrando várias estatísticas da doença.""")
-st.image("img/logo WHO.png", width=80)
+st.image("img/logo_covid19.png", width=300)
 
 #Create Table Plotly
 #from plotly.figure_factory import create_table
@@ -84,4 +84,4 @@ st.sidebar.markdown("")
 st.sidebar.markdown("")
 st.sidebar.markdown("")
 st.sidebar.markdown("")
-st.sidebar.image("img/logo.png", caption="Data Analytics")
+st.sidebar.image("img/logo.png", caption="Create by", width=300)
