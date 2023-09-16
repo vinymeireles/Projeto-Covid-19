@@ -5,7 +5,6 @@ import plotly.express as px
 from plotly.subplots import make_subplots
 from plotly import graph_objs as go
 import matplotlib.pyplot as plt
-from keras.models import load_model
 import warnings
 warnings.filterwarnings("ignore")
 
