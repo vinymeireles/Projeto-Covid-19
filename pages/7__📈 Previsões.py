@@ -3,15 +3,18 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from plotly.subplots import make_subplots
-from plotly import graph_objs as go
+import plotly.graph_objects as go
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings("ignore")
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn import linear_model
+from datetime import timedelta, date
 
 
 
 st.title("📈Previsões de novos casos: 2020 - 2023")
-st.markdown("Previsões futuras utilizando Inteligência Artificial para calcular novos casos de acordo com o tempo em dias.")
+st.markdown("""Previsões futuras utilizando Inteligência Artificial para calcular novos casos de acordo com o tempo em dias. Visualização dos resultados das previsões em relação ao tempo IA (Deep Learning)""")
 
 #load data
 @st.cache_data
@@ -123,9 +126,136 @@ if st.sidebar.checkbox("📊 Mostrar Gráficos", False, key=2):
         fig.update_layout(title_text='10 Países com maiores casos ativos!')
         st.plotly_chart(fig)   
 
+################################################################################
 # Previsões futuras de novos casos em relação ao tempo (Days)
-if st.sidebar.checkbox("⏰ Previsões Futuras", False, key=8):
-    st.markdown("📈 Visualização dos resultados das previsões em relação ao tempo IA (Deep Learning)")
+if st.sidebar.checkbox("⏰ Previsões no Brasil", False, key=8):
+    st.markdown("🌎 Dados de evolução do Covid19 no Brasil")
 
-    lstm_data = table.groupby('ObservationDate')[['Confirmed', 'Deaths', 'Recovered']].sum().reset_index()
-    st.write(lstm_data)
+    with st.expander("🗓 Visualizar o DataFrame dos casos confirmado por dia no BRASIL"):
+        df_brasil = table.loc[table['Country/Region'] == 'Brazil'].reset_index().drop(columns=['Country/Region','SNo', 'Province/State','index','Last Update'], axis=1)
+        df_brasil['ObservationDate'] = pd.to_datetime(df_brasil['ObservationDate'] , format="%m/%d/%Y").dt.strftime('%Y-%m-%d')
+        df_brasil2 = df_brasil[df_brasil.Confirmed > 0]
+        st.dataframe(df_brasil2, use_container_width=True)
+    st.divider()    
+
+    #Visualização do gráfico no Brasil por dia: Casos Confirmados
+    st.markdown(" 📊Visualização Gráfico dos casos confirmados no Brasil")
+    if not st.checkbox('Ocultar gráfico 1', False, key=9):
+        fig = px.line(df_brasil2, x='Days', y='Confirmed',
+                labels={'Days':'Dias', 'Confirmed':'Número de casos confirmados'},
+                title='Casos confirmados no Brasil', width=800, height=400)
+
+        fig.update_layout(
+            margin=dict(l=30, r=20, t=60, b=5),
+            font=dict(size=15, color='black')
+        )
+        st.plotly_chart(fig)
+    st.divider()     
+
+    #Função para fazer a contagem de novos casos:
+    #[Subtração entre o número de casos de um dia e o dia anterior]
+    def dif(v):
+        J=[v[i+1]-v[i] for i in range(len(v)-1)]
+        J.insert(0, v[0])
+        return J
+
+    def dif2(v):
+        J=[v[0]]
+        for i in range(len(v)-1):
+            J.append(v[i+1]-v[i])
+        return np.array(J)
+
+    df_brasil2 = df_brasil2.assign(novoscasos=dif(df_brasil2['Confirmed'].values))
+    df_brasil2 = df_brasil2[df_brasil2.novoscasos > 0]
+    
+    #Visualização do gráfico no Brasil por dia: Casos Confirmados
+    if not st.checkbox('Ocultar gráfico 2', False, key=10):
+        graph1 = px.line(df_brasil2, x="Days", y="novoscasos", title = 'Novos casos confirmado no Brasil', template='plotly_dark')
+        graph1.update_traces(line_color='yellow')
+        st.plotly_chart(graph1)
+        st.divider() 
+
+    #Visualização do gráfico no Brasil por dia: óbitos
+    if not st.checkbox('Ocultar gráfico 3', False, key=11):
+        fig2 = go.Figure()
+        fig2.add_trace(
+        go.Scatter(x=df_brasil2.Days, y=df_brasil2.Deaths,
+                name='Óbitos', mode='lines+markers', line=dict(color='red'))
+        )
+
+        fig2.update_layout(title='Mortes por COVID-19 no Brasil',
+                    xaxis_title='Dias', yaxis_title='Número de Óbitos',
+                    margin=dict(l=30, r=30, t=50, b=5),
+                    width=1000, height=400, font=dict(size=16))
+        st.plotly_chart(fig2)
+        st.divider()
+##############################################################################################################################################################
+   
+
+#Previsões de novos casos baseados em Machine Learning.  
+if st.sidebar.checkbox("⏳ Previsões no Mundo", False, key=12):
+    
+    @st.cache_data
+    def load_data1():
+        data1 = pd.read_csv("data/cases_world.csv")
+        return data1
+
+    df_world= load_data1()
+    
+    st.markdown("🌍 Dados de Previsão de novos casos do Covid19 no Mundo entre [03/01/2020] - [30/08/2023]")
+
+    with st.expander("🗓 Visualizar o DataFrame dos casos confirmado por dia no Mundo"):
+        st.dataframe(df_world, use_container_width=True)
+
+    df_world = df_world[['days','cases']]    
+    st.divider()
+    #### PREPARE DATA ####
+    x = np.array(df_world['days']).reshape(-1, 1)
+    y = np.array(df_world['cases']).reshape(-1, 1)
+    polyFeat = PolynomialFeatures(degree=3)
+    x = polyFeat.fit_transform(x)
+    
+    #### TRAINING DATA ####
+    model = linear_model.LinearRegression()
+    model.fit(x,y)
+    accuracy = model.score(x,y)
+    st.markdown('🎯Accurácia de acerto do modelo de Machine Learning - IA')
+    st.info(f'Accuracy: {round(accuracy*100,3)} %')
+    y0 = model.predict(x)
+    st.divider()
+
+    #### PREDICTION ####
+    st.subheader("Previsões de novos casos")
+    days = st.slider('Selecione o número de dias:', 15, 90, 30)
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.info(f"📆 Previsão de novos casos após {days} dias.")
+    with col2:    
+        total_cases = (round(int(model.predict(polyFeat.fit_transform([[234+days]])))/1000000,2))
+        st.info(f"📝 {total_cases} Milhões de casos.")
+    with col3:
+        dt_fin = '30/08/2023'
+        date2= (pd.to_datetime(dt_fin) + pd.DateOffset(days)).date().strftime('%d/%m/%Y')
+        st.info(f"📆 Data da previsão: {date2}")
+
+
+    x1 = np.array(list(range(1, 234+days))).reshape(-1,1)
+    y1 = model.predict(polyFeat.fit_transform(x1))
+    
+    st.divider()
+    #Visualização do gráfico no Brasil por dia: Casos Confirmados
+    st.markdown("📈 Gráfico de novos casos x dias")
+    if not st.checkbox('Ocultar gráfico', False, key=10):
+        fig3 = plt.figure(figsize=(8,8))
+        plt.style.use("dark_background")
+        plt.xlabel('Dias')
+        plt.ylabel('Milhão de Casos')
+        plt.title("Previsão de novos casos de Covid 19 Mundial após x dias")
+        plt.plot(y1,'b')
+        plt.plot(y0,'r')
+        st.pyplot(fig3)
+
+    
+  
+      
