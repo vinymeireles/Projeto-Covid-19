@@ -1,6 +1,13 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
+#Apps
+st.set_page_config(page_title="App Covid 19", page_icon= ":bar_chart:")
+st.title("💉Covid19: Dashboard Analytics📊")
+
+# Style
+with open('style.css')as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html = True)
 
 st.markdown("<h2 style='text-align: center; color: red;'>🪧 Contatos</h2>", unsafe_allow_html=True)
 

@@ -11,7 +11,13 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn import linear_model
 from datetime import timedelta, date
 
+#Apps
+st.set_page_config(page_title="App Covid 19", page_icon= ":bar_chart:")
+st.title("💉Covid19: Dashboard Analytics📊")
 
+# Style
+with open('style.css')as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html = True)
 
 st.title("📈Previsões de novos casos: 2020 - 2023")
 st.markdown("""Previsões futuras utilizando Inteligência Artificial para calcular novos casos de acordo com o tempo em dias. Visualização dos resultados das previsões em relação ao tempo IA (Deep Learning)""")
